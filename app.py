@@ -67,50 +67,59 @@ def index():
         if 'file' not in request.files:
             flash('No file uploaded', 'error')
             return redirect(url_for('index'))
-        
+
         file = request.files['file']
         if file.filename == '':
             flash('No file selected', 'error')
             return redirect(url_for('index'))
-        
-        allowed_extensions = {'csv', 'txt', 'doc', 'docx', 'pdf', 'json', 'log'}
-        file_extension = file.filename.split('.')[-1].lower()
-        
-        if file_extension not in allowed_extensions:
-            flash('Invalid file type. Allowed file types: CSV, TXT, DOC, DOCX, PDF, JSON, LOG.', 'error')
-            return redirect(url_for('index'))
-        
+
         try:
+            # Step 1: Extract text from the uploaded file
             file_content = extract_text_from_file(file)
             if not file_content:
                 flash('Failed to extract text from the file.', 'error')
                 return redirect(url_for('index'))
-            
-            report_content = generate_report(file_content)
-            report = Report(title=file.filename, content=report_content, user_id=current_user.id)
-            db.session.add(report)
-            db.session.commit()
-            app.logger.info(f"Report generated successfully with ID: {report.id}")
-            
-            flash('Report generated successfully!', 'success')
-            # return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
-            return render_template('report.html', report=report, report_html=report_html)
+
+            # Step 2: Display extracted text in the preview
+            return render_template('index.html', extracted_text=file_content)
         except Exception as e:
             flash(f'An error occurred: {str(e)}', 'error')
             return redirect(url_for('index'))
-    
+
     return render_template('index.html')
+
+@app.route('/generate-report', methods=['POST'])
+@login_required
+def generate_report_route():
+    if 'extracted_text' not in request.form:
+        flash('No extracted text found.', 'error')
+        return redirect(url_for('index'))
+
+    extracted_text = request.form['extracted_text']
+
+    try:
+        # Step 3: Generate report using the extracted text
+        report_content = generate_report(extracted_text)
+        report = Report(title='Generated Report', content=report_content, user_id=current_user.id)
+        db.session.add(report)
+        db.session.commit()
+
+        flash('Report generated successfully!', 'success')
+        return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'error')
+        return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-        
+
         if user and user.password == password:
             login_user(user)
             flash('Login successful!', 'success')
@@ -118,19 +127,19 @@ def login():
         else:
             flash('Invalid username or password', 'error')
             return redirect(url_for('login'))
-    
+
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
-    
+
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        
+
         if User.query.filter_by(username=username).first():
             flash('Username already exists', 'error')
             return redirect(url_for('register'))
@@ -143,7 +152,7 @@ def register():
             db.session.commit()
             flash('Registration successful! Please login.', 'success')
             return redirect(url_for('login'))
-    
+
     return render_template('register.html')
 
 @app.route('/logout')

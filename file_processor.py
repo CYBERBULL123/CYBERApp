@@ -10,35 +10,41 @@ logger = logging.getLogger(__name__)
 def extract_text_from_file(file):
     """
     Extract text from a file based on its extension.
-    Supported file types: .txt, .log, .pdf, .doc, .docx, .html, .xml
+    Supported file types: .txt, .log, .pdf, .doc, .docx, .html, .xml, .csv, .json
     """
     filename = file.filename
     file_extension = filename.split('.')[-1].lower()
 
     try:
-        if file_extension in ['txt', 'log']:
-            # Read text directly from .txt or .log files
-            return file.read().decode('utf-8')
+        if file_extension in ['txt', 'log', 'csv', 'json']:
+            # Read text directly from .txt, .log, .csv, or .json files
+            file_content = file.read().decode('utf-8')
+            file.seek(0)  # Reset file pointer
+            return file_content
 
         elif file_extension == 'pdf':
             # Extract text from PDF files
-            pdf_reader = PyPDF2.PdfReader(file)
+            pdf_reader = PyPDF2.PdfReader(file.stream)
             text = ''
             for page in pdf_reader.pages:
                 text += page.extract_text()
+            file.seek(0)  # Reset file pointer
             return text
 
         elif file_extension in ['doc', 'docx']:
             # Extract text from Word documents
-            doc = Document(file)
+            doc = Document(file.stream)
             text = ''
             for paragraph in doc.paragraphs:
                 text += paragraph.text + '\n'
+            file.seek(0)  # Reset file pointer
             return text
 
         elif file_extension in ['html', 'xml']:
             # Extract text from HTML/XML files using BeautifulSoup
-            soup = BeautifulSoup(file.read(), 'html.parser')
+            file_content = file.read().decode('utf-8')
+            soup = BeautifulSoup(file_content, 'html.parser')
+            file.seek(0)  # Reset file pointer
             return soup.get_text()
 
         else:

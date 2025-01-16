@@ -9,7 +9,7 @@
             <div class="upload-area" id="uploadArea">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Drag and drop files here or <span class="browse-link">browse</span></p>
-                <input type="file" name="file" id="file" required multiple accept=".csv,.json,.txt">
+                <input type="file" name="file" id="file" required multiple accept=".csv,.json,.txt,.log,.pdf,.doc,.docx,.html,.xml">
             </div>
             <!-- File Preview -->
             <div class="file-preview" id="filePreview">
@@ -21,11 +21,13 @@
             </div>
             <!-- Loading Spinner -->
             <div id="loadingSpinner" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Generating report...
+                <i class="fas fa-spinner fa-spin"></i> Processing...
             </div>
+            <!-- Hidden field to store extracted text -->
+            <input type="hidden" id="extractedText" name="extractedText" value="{{ extracted_text }}">
             <!-- Buttons -->
             <div class="form-buttons">
-                <button type="submit" class="btn-primary">
+                <button type="submit" class="btn-primary" id="generateReportButton">
                     <i class="fas fa-magic"></i> Generate Report
                 </button>
                 <button type="button" class="btn-secondary" id="clearFilesButton">
