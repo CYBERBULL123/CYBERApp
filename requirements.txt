@@ -1,0 +1,12 @@
+Flask
+Flask-Login
+Flask-SQLAlchemy
+google-generativeai
+reportlab
+langchain
+langchain-google-genai
+markdown
+bs4
+PyPDF2
+python-docx
+python-dotenv

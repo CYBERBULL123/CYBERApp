@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="report-container">
+    <h1>{{ report.title }}</h1>
+    <p class="report-date">Generated on: {{ report.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <div class="report-content">
+        {{ report_html | safe }}
+    </div>
+    <div class="report-actions">
+        <a href="{{ url_for('download', report_id=report.id) }}" class="btn-primary">
+            <i class="fas fa-download"></i> Download PDF
+        </a>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}

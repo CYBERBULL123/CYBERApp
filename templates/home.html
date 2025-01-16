@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="home-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to CyberSec AI</h1>
+            <p class="hero-subtitle">Your Ultimate Cybersecurity Report Generation Tool</p>
+            <p class="hero-description">
+                CyberSec AI is a cutting-edge platform designed to help cybersecurity professionals and organizations
+                generate detailed, professional reports with ease. Leverage the power of AI to analyze your data and
+                create actionable insights.
+            </p>
+            <div class="hero-actions">
+                <a href="{{ url_for('login') }}" class="btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Get Started
+                </a>
+                <a href="#features" class="btn-secondary">
+                    <i class="fas fa-info-circle"></i> Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="features-section">
+        <h2 class="section-title">Why Choose CyberSec AI?</h2>
+        <p class="section-description">
+            CyberSec AI offers a range of powerful features to simplify your cybersecurity reporting process.
+        </p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h3 class="feature-title">AI-Powered Reports</h3>
+                <p class="feature-description">
+                    Generate professional cybersecurity reports using advanced AI technology. Our system analyzes your
+                    data and provides actionable insights.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-file-upload feature-icon"></i>
+                <h3 class="feature-title">Easy File Upload</h3>
+                <p class="feature-description">
+                    Upload your data files (CSV, JSON, TXT, DOC, PDF, LOG) and let the AI do the rest. We support a wide
+                    range of file formats.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3 class="feature-title">Interactive Dashboard</h3>
+                <p class="feature-description">
+                    View and analyze your reports with an interactive dashboard. Track trends, vulnerabilities, and
+                    recommendations in real-time.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-download feature-icon"></i>
+                <h3 class="feature-title">Download Reports</h3>
+                <p class="feature-description">
+                    Download your reports in PDF format for easy sharing and printing. Export your data for further
+                    analysis.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-lock feature-icon"></i>
+                <h3 class="feature-title">Secure & Reliable</h3>
+                <p class="feature-description">
+                    Your data is safe with us. We use industry-standard encryption and security practices to protect
+                    your information.
+                </p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-users feature-icon"></i>
+                <h3 class="feature-title">Collaborate with Teams</h3>
+                <p class="feature-description">
+                    Share reports with your team and collaborate on cybersecurity strategies. Manage access and
+                    permissions effortlessly.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="how-it-works-section">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-description">
+            CyberSec AI simplifies the process of generating cybersecurity reports. Here's how it works:
+        </p>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3 class="step-title">Upload Your Data</h3>
+                <p class="step-description">
+                    Upload your cybersecurity data files (CSV, JSON, TXT, DOC, PDF, LOG) to the platform.
+                </p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3 class="step-title">Generate Report</h3>
+                <p class="step-description">
+                    Our AI processes your data and generates a detailed cybersecurity report with key findings and
+                    recommendations.
+                </p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3 class="step-title">View & Download</h3>
+                <p class="step-description">
+                    View the report on your dashboard or download it as a PDF for offline use and sharing.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="benefits-section">
+        <h2 class="section-title">Benefits of Using CyberSec AI</h2>
+        <p class="section-description">
+            Discover the advantages of using CyberSec AI for your cybersecurity reporting needs.
+        </p>
+        <div class="benefits-grid">
+            <div class="benefit-card">
+                <i class="fas fa-clock benefit-icon"></i>
+                <h3 class="benefit-title">Save Time</h3>
+                <p class="benefit-description">
+                    Automate the report generation process and save hours of manual work.
+                </p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-chart-pie benefit-icon"></i>
+                <h3 class="benefit-title">Data-Driven Insights</h3>
+                <p class="benefit-description">
+                    Get actionable insights from your data to improve your cybersecurity posture.
+                </p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-user-shield benefit-icon"></i>
+                <h3 class="benefit-title">Enhanced Security</h3>
+                <p class="benefit-description">
+                    Identify vulnerabilities and risks with detailed analysis and recommendations.
+                </p>
+            </div>
+            <div class="benefit-card">
+                <i class="fas fa-hand-holding-usd benefit-icon"></i>
+                <h3 class="benefit-title">Cost-Effective</h3>
+                <p class="benefit-description">
+                    Reduce the cost of manual report generation and focus on what matters most.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="footer-section">
+        <p class="footer-text">Designed with ❤️ by <span class="designer-name">Aditya</span></p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a> |
+            <a href="#">Terms of Service</a> |
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+</div>
+{% endblock %}

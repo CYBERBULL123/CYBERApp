@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <h1 class="error-title">File Upload Error</h1>
+        <p class="error-message">
+            The file you uploaded is not supported. Please upload only the following file types:
+            <strong>CSV, TXT, DOC, DOCX, PDF, JSON, LOG</strong>.
+        </p>
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="btn-primary">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+            <a href="{{ url_for('index') }}" class="btn-secondary">
+                <i class="fas fa-upload"></i> Try Again
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

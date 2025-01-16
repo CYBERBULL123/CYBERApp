@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <h1>Welcome to CyberSec AI</h1>
+        <p>Generate professional cybersecurity reports with ease.</p>
+        <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+            <!-- Drag-and-Drop Area -->
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag and drop files here or <span class="browse-link">browse</span></p>
+                <input type="file" name="file" id="file" required multiple accept=".csv,.json,.txt">
+            </div>
+            <!-- File Preview -->
+            <div class="file-preview" id="filePreview">
+                <p>No files selected</p>
+            </div>
+            <!-- Progress Bar -->
+            <div class="progress-bar" id="progressBar">
+                <div class="progress"></div>
+            </div>
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Generating report...
+            </div>
+            <!-- Buttons -->
+            <div class="form-buttons">
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-magic"></i> Generate Report
+                </button>
+                <button type="button" class="btn-secondary" id="clearFilesButton">
+                    <i class="fas fa-times"></i> Clear Files
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+{% endblock %}
