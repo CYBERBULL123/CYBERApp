@@ -1,5 +1,7 @@
 import os
 import logging
+import re
+import requests
 from typing import Dict, Any
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
@@ -12,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
+
 # Load API key from environment variable for security
 API_KEY = os.getenv('GOOGLE_API_KEY')
 
@@ -47,16 +50,52 @@ def initialize_memory() -> ConversationBufferMemory:
         logger.error(f"Failed to initialize memory: {str(e)}")
         raise
 
+def scrape_google_search(query: str) -> str:
+    """
+    Scrape Google search results for a given query without using any frameworks.
+    """
+    try:
+        # Prepare the search URL
+        search_url = f"https://www.google.com/search?q={query}"
+        
+        # Set headers to mimic a browser request
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        }
+        
+        # Send a GET request to Google
+        response = requests.get(search_url, headers=headers)
+        response.raise_for_status()  # Raise an error for bad status codes
+        
+        # Extract search results using regex
+        search_results = []
+        pattern = r'<h3[^>]*>(.*?)<\/h3>'  # Regex to match search result titles
+        matches = re.findall(pattern, response.text)
+        
+        # Clean up the results
+        for match in matches:
+            clean_result = re.sub(r'<[^>]+>', '', match)  # Remove HTML tags
+            search_results.append(clean_result)
+        
+        # Return the top 3 results
+        return "\n".join(search_results[:3])
+    except Exception as e:
+        logger.error(f"Failed to scrape Google search results: {str(e)}")
+        raise
+
 def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
     """
     Create and return the LLMChain for report generation.
     """
     try:
         prompt_template = PromptTemplate(
-            input_variables=["data"],
+            input_variables=["data", "search_results"],
             template="""
-            Generate a professional cybersecurity report based on the following data:
+            You are a cybersecurity expert. Generate a professional and detailed cybersecurity report based on the following data:
             {data}
+
+            Additionally, use the following search results to enhance the report:
+            {search_results}
 
             The report should include:
             1. Executive Summary
@@ -64,6 +103,9 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
             3. Key Findings
             4. Recommendations
             5. Conclusion
+            6. References (with their official links)
+
+            Ensure the report is well-structured, concise, and actionable.
             """
         )
         report_chain = LLMChain(llm=llm, prompt=prompt_template)
@@ -102,8 +144,12 @@ def generate_report(data: str) -> str:
         llm = initialize_llm()
         report_chain = create_report_chain(llm)
         
-        # Wrap the data in a dictionary
-        input_data = {"data": data}
+        # Gather additional information from the web using scraping
+        search_query = f"Cybersecurity trends and insights related to: {data}"
+        search_results = scrape_google_search(search_query)
+        
+        # Wrap the data and search results in a dictionary
+        input_data = {"data": data, "search_results": search_results}
         
         # Generate the report using the LangChain
         report = report_chain.run(input_data)
