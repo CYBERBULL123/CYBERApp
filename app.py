@@ -93,7 +93,8 @@ def index():
             app.logger.info(f"Report generated successfully with ID: {report.id}")
             
             flash('Report generated successfully!', 'success')
-            return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+            # return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+            return render_template('report.html', report=report, report_html=report_html)
         except Exception as e:
             flash(f'An error occurred: {str(e)}', 'error')
             return redirect(url_for('index'))
