@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cybersecurity Reports</title>
+    <title>Cybersecurity Reports - CyberSec AI</title>
+    <!-- Meta Descriptions for SEO -->
+    <meta name="description" content="CyberSec AI is a cutting-edge platform for generating and analyzing cybersecurity reports. Stay secure with real-time insights and AI-driven threat detection.">
+    <meta name="keywords" content="cybersecurity, AI, threat detection, security reports, CyberSec AI, cyber threats">
+    <meta name="author" content="CyberSec AI Team">
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='imgs/detective.png') }}" type="image/x-icon">
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -88,6 +95,14 @@
             hamburger.addEventListener('click', () => {
                 navLinks.classList.toggle('active');
                 hamburger.classList.toggle('active');
+            });
+
+            // Close flash messages
+            const closeButtons = document.querySelectorAll('.flash-message .close');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.parentElement.classList.remove('show');
+                });
             });
         });
     </script>
