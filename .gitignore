@@ -1,28 +1,41 @@
-# Ignore the virtual environment directory
-env/
-venv/
+# Ignore environment variables
 .env
 
-# Ignore Flask cache
+# Ignore SQLite database files
+*.db
+instance/cybersecurity.db
+
+# Ignore instace folder
+instance/
+
+
+# Ignore Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.db
-*.sqlite3
 
-# Ignore IDE specific files
+# Ignore uploaded files
+uploads/
+
+# Ignore IDE-specific files
 .idea/
 .vscode/
+*.swp
+*.swo
 
-# Ignore environment variables file
-.env
+# Ignore system-specific files
+.DS_Store
+Thumbs.db
 
-# Ignore other common files
+# Ignore local development files
 *.log
 *.pot
-*.pyc
-*.pyo
-*.pyd
-*.db
-*.sqlite3
+*.pid
+
+# Ignore compiled Python modules
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
