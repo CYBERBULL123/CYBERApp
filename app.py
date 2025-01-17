@@ -9,14 +9,24 @@ import markdown
 from io import BytesIO
 from langchain_agent import generate_report
 from file_processor import extract_text_from_file
+from dotenv import load_dotenv
 
 # Flask app setup
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'  # Required for session management
+load_dotenv()
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')  # Use environment variable for secret key
 
-# Set the database URI using an absolute path
+# Database configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "cybersecurity.db")}'
+
+# Use SQLite for development and PostgreSQL for production
+if os.getenv('FLASK_ENV') == 'production':
+    # PostgreSQL for production
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')  # Use the PostgreSQL URL from environment
+else:
+    # SQLite for development
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(basedir, "instance", "cybersecurity.db")}'
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Disable modification tracking
 db = SQLAlchemy(app)
