@@ -30,13 +30,19 @@
         </div>
         <!-- Navigation Links -->
         <ul class="nav-links">
-            <li>
-                <a href="{{ url_for('home') }}">
-                    <i class="fas fa-home"></i>
-                    <span>Home</span>
-                </a>
-            </li>
             {% if current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('home_page') }}">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('home') }}">
+                        <i class="fas fa-upload"></i>
+                        <span>Upload</span>
+                    </a>
+                </li>
                 <li>
                     <a href="{{ url_for('dashboard') }}">
                         <i class="fas fa-tachometer-alt"></i>

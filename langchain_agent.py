@@ -8,6 +8,7 @@ from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+from file_processor import extract_keywords_and_numeric_values
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -89,7 +90,7 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
     """
     try:
         prompt_template = PromptTemplate(
-            input_variables=["data", "search_results"],
+            input_variables=["data", "search_results", "keywords", "numeric_values"],
             template="""
             You are a cybersecurity expert. Generate a professional and detailed cybersecurity report based on the following data:
             {data}
@@ -97,15 +98,18 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
             Additionally, use the following search results to enhance the report:
             {search_results}
 
+            The following keywords were extracted from the data:
+            {keywords}
+
             The report should include:
             1. Executive Summary
-            2. Detailed Analysis
+            2. Detailed Analysis (including technical details like IPs, versions, etc.)
             3. Key Findings
-            4. Recommendations
+            4. Recommendations (specific and actionable)
             5. Conclusion
             6. References (with their official links)
 
-            Ensure the report is well-structured, concise, and actionable.
+            Ensure the report is well-structured, concise, and actionable. Use technical terms and provide in-depth analysis.
             """
         )
         report_chain = LLMChain(llm=llm, prompt=prompt_template)
@@ -144,12 +148,22 @@ def generate_report(data: str) -> str:
         llm = initialize_llm()
         report_chain = create_report_chain(llm)
         
+        # Extract keywords and numeric values from the input data
+        keywords, numeric_values = extract_keywords_and_numeric_values(data)
+        logger.info(f"Extracted keywords: {keywords}")
+        logger.info(f"Extracted numeric values: {numeric_values}")
+        
         # Gather additional information from the web using scraping
-        search_query = f"Cybersecurity trends and insights related to: {data}"
+        search_query = f"Cybersecurity trends and insights related to: {', '.join(keywords)}"
         search_results = scrape_google_search(search_query)
         
-        # Wrap the data and search results in a dictionary
-        input_data = {"data": data, "search_results": search_results}
+        # Wrap the data, search results, keywords, and numeric values in a dictionary
+        input_data = {
+            "data": data,
+            "search_results": search_results,
+            "keywords": keywords,
+            # "numeric_values": numeric_values,
+        }
         
         # Generate the report using the LangChain
         report = report_chain.run(input_data)

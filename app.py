@@ -70,6 +70,10 @@ def home():
         return redirect(url_for('index'))
     return render_template('home.html')
 
+@app.route('/home')
+def home_page():
+    return render_template('home.html')
+
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():

@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import PyPDF2
 from docx import Document
 import logging
+import re
+from typing import Tuple, List, Dict
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -11,6 +13,12 @@ def extract_text_from_file(file):
     """
     Extract text from a file based on its extension.
     Supported file types: .txt, .log, .pdf, .doc, .docx, .html, .xml, .csv, .json
+    
+    Args:
+        file: The file object to extract text from.
+    
+    Returns:
+        str: The extracted text, or None if extraction fails.
     """
     filename = file.filename
     file_extension = filename.split('.')[-1].lower()
@@ -54,3 +62,53 @@ def extract_text_from_file(file):
     except Exception as e:
         logger.error(f"Error extracting text from {filename}: {e}")
         return None
+
+def extract_keywords_and_numeric_values(text: str) -> Tuple[List[str], Dict[str, str]]:
+    """
+    Extract all keywords and numeric values (e.g., IPs, versions) from the input text using regex.
+    
+    Args:
+        text (str): The input text to extract keywords and numeric values from.
+    
+    Returns:
+        Tuple[List[str], Dict[str, str]]: A tuple containing:
+            - List of all keywords.
+            - Dictionary of numeric values with their types (e.g., {"ip": "192.168.1.1"}).
+    """
+    try:
+        # Convert text to lowercase
+        text = text.lower()
+        
+        # Extract keywords using regex (words with 3 or more letters)
+        keywords = re.findall(r'\b[a-zA-Z]{3,}\b', text)
+        
+        # Remove duplicates
+        keywords = list(set(keywords))
+        
+        # Extract numeric values (IPs, versions, etc.)
+        numeric_values = {}
+        
+        # Regex to match IP addresses
+        ip_pattern = r'\b(?:\d{1,3}\.){3}\d{1,3}\b'
+        ips = re.findall(ip_pattern, text)
+        if ips:
+            numeric_values["ip"] = ips[0]  # Store the first IP found
+        
+        # Regex to match version numbers (e.g., 2.4.49)
+        version_pattern = r'\b(?:\d+\.)+\d+\b'
+        versions = re.findall(version_pattern, text)
+        if versions:
+            numeric_values["version"] = versions[0]  # Store the first version found
+        
+        # Regex to match other numeric values (e.g., ports, IDs)
+        numeric_pattern = r'\b\d+\b'
+        numbers = re.findall(numeric_pattern, text)
+        if numbers:
+            numeric_values["numeric"] = numbers  # Store all numeric values
+        
+        logger.info(f"Extracted keywords: {keywords}")
+        logger.info(f"Extracted numeric values: {numeric_values}")
+        return keywords, numeric_values
+    except Exception as e:
+        logger.error(f"Failed to extract keywords and numeric values: {str(e)}")
+        raise
