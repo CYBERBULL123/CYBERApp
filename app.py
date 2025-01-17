@@ -101,16 +101,20 @@ def index():
 @app.route('/generate-report', methods=['POST'])
 @login_required
 def generate_report_route():
-    if 'extracted_text' not in request.form:
-        flash('No extracted text found.', 'error')
+    if 'extracted_text' not in request.form or 'fileName' not in request.form:
+        flash('No extracted text or file name found.', 'error')
         return redirect(url_for('index'))
 
     extracted_text = request.form['extracted_text']
+    file_name = request.form['fileName']
 
     try:
         # Step 3: Generate report using the extracted text
         report_content = generate_report(extracted_text)
-        report = Report(title='Generated Report', content=report_content, user_id=current_user.id)
+
+        # Use the file name as the report title
+        report_title = f"Report for {file_name}"
+        report = Report(title=report_title, content=report_content, user_id=current_user.id)
         db.session.add(report)
         db.session.commit()
 

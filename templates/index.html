@@ -15,16 +15,10 @@
             <div class="file-preview" id="filePreview">
                 <p>No files selected</p>
             </div>
-            <!-- Progress Bar -->
-            <div class="progress-bar" id="progressBar">
-                <div class="progress"></div>
-            </div>
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" style="display: none;">
-                <i class="fas fa-spinner fa-spin"></i> Processing...
-            </div>
             <!-- Hidden field to store extracted text -->
             <input type="hidden" id="extractedText" name="extractedText" value="{{ extracted_text }}">
+            <!-- Hidden field to store file name -->
+            <input type="hidden" id="fileName" name="fileName" value="{{ file_name }}">
             <!-- Buttons -->
             <div class="form-buttons">
                 <button type="submit" class="btn-primary" id="generateReportButton">
@@ -37,5 +31,14 @@
         </form>
     </div>
 </div>
+
+<!-- Full-Screen Loading Spinner -->
+<div id="fullScreenSpinner" class="full-screen-spinner">
+    <div class="spinner-content">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Processing...</p>
+    </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

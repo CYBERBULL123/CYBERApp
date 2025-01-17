@@ -129,7 +129,6 @@ nav .hamburger .line {
 
 /* ==================== HERO SECTION ==================== */
 .hero {
-    background: url('../imgs') no-repeat center center/cover; /* Background image */
     height: 100vh;
     display: flex;
     align-items: center;
@@ -322,18 +321,29 @@ nav .hamburger .line {
     box-shadow: none; /* Remove shadow on click */
 }
 
-/* Spinner Styles */
-#loadingSpinner {
-    display: none;
-    align-items: center;
+/* Full-Screen Spinner */
+.full-screen-spinner {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+    z-index: 1000; /* Ensure it's on top of everything */
     justify-content: center;
-    margin-top: 20px;
-    font-size: 18px;
-    color: rgb(34, 238, 24);
+    align-items: center;
 }
 
-#loadingSpinner .fa-spinner {
-    margin-right: 10px;
+.full-screen-spinner .spinner-content {
+    text-align: center;
+    color: #00d1b2;
+    font-size: 1.5rem;
+}
+
+.full-screen-spinner .fa-spinner {
+    font-size: 3rem;
+    margin-bottom: 1rem;
     animation: spin 1s linear infinite;
 }
 

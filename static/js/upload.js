@@ -2,10 +2,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploadArea = document.getElementById('uploadArea');
     const fileInput = document.getElementById('file');
     const filePreview = document.getElementById('filePreview');
-    const loadingSpinner = document.getElementById('loadingSpinner');
     const clearFilesButton = document.getElementById('clearFilesButton');
     const generateReportButton = document.getElementById('generateReportButton');
     const extractedTextInput = document.getElementById('extractedText');
+    const fullScreenSpinner = document.getElementById('fullScreenSpinner'); // Full-screen spinner
+    const fileNameInput = document.createElement('input'); // Create a hidden input for the file name
+    fileNameInput.type = 'hidden';
+    fileNameInput.id = 'fileName';
+    document.body.appendChild(fileNameInput); // Append it to the body
 
     // Allowed file types
     const allowedFileTypes = ['csv', 'txt', 'log', 'pdf', 'doc', 'docx', 'html', 'xml', 'json'];
@@ -32,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.value = ''; // Clear the file input
         filePreview.innerHTML = '<p>No files selected</p>'; // Reset the preview
         extractedTextInput.value = ''; // Clear the extracted text
+        fileNameInput.value = ''; // Clear the file name
     });
 
     // Browse Files
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        loadingSpinner.style.display = 'block'; // Show loading spinner
+        fullScreenSpinner.style.display = 'flex'; // Show full-screen spinner
 
         const formData = new FormData();
         for (const file of fileInput.files) {
@@ -67,16 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(data, 'text/html');
                 const extractedText = doc.querySelector('#extractedText').value;
+                const fileNameWithExtension = fileInput.files[0].name; // Get the file name with extension
+                const fileName = fileNameWithExtension.split('.').slice(0, -1).join('.'); // Remove the extension
                 filePreview.innerHTML = `<pre>${extractedText}</pre>`; // Display extracted text
                 extractedTextInput.value = extractedText; // Store extracted text in hidden input
+                fileNameInput.value = fileName; // Store file name (without extension) in hidden input
             } else {
                 throw new Error('File upload failed');
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            window.location.href = '/error'; // Redirect to error page
         } finally {
-            loadingSpinner.style.display = 'none'; // Hide loading spinner
+            fullScreenSpinner.style.display = 'none'; // Hide full-screen spinner
         }
     }
 
@@ -85,13 +93,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault(); // Prevent form submission
 
         const extractedText = extractedTextInput.value;
+        const fileName = fileNameInput.value; // Get the file name (without extension)
 
-        if (!extractedText) {
-            alert('No extracted text found. Please upload a file first.');
+        if (!extractedText || !fileName) {
+            window.location.href = '/error'; // Redirect to error page if no extracted text or file name
             return;
         }
 
-        loadingSpinner.style.display = 'block'; // Show loading spinner
+        fullScreenSpinner.style.display = 'flex'; // Show full-screen spinner
 
         try {
             const response = await fetch('/generate-report', {
@@ -99,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `extracted_text=${encodeURIComponent(extractedText)}`,
+                body: `extracted_text=${encodeURIComponent(extractedText)}&fileName=${encodeURIComponent(fileName)}`,
             });
 
             if (response.redirected) {
@@ -109,9 +118,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            window.location.href = '/error'; // Redirect to error page
         } finally {
-            loadingSpinner.style.display = 'none'; // Hide loading spinner
+            fullScreenSpinner.style.display = 'none'; // Hide full-screen spinner
         }
     });
 });
