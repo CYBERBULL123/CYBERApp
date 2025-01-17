@@ -13,4 +13,3 @@ python-dotenv
 gunicorn
 requests
 psycopg2-binary
-nltk
