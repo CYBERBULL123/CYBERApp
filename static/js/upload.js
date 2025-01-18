@@ -5,7 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearFilesButton = document.getElementById('clearFilesButton');
     const generateReportButton = document.getElementById('generateReportButton');
     const extractedTextInput = document.getElementById('extractedText');
-    const fullScreenSpinner = document.getElementById('fullScreenSpinner'); // Full-screen spinner
+    const fullScreenSpinner = document.getElementById('fullScreenSpinner');
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
     const fileNameInput = document.createElement('input'); // Create a hidden input for the file name
     fileNameInput.type = 'hidden';
     fileNameInput.id = 'fileName';
@@ -100,7 +103,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        fullScreenSpinner.style.display = 'flex'; // Show full-screen spinner
+        // Show and progress bar
+        progressBarContainer.style.display = 'flex';
+        progressBar.style.width = '0';
+        progressText.textContent = '0%'; // Start with 0%
+
+        // Simulate progress bar animation
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 1;
+            progressBar.style.width = `${progress}%`;
+            progressText.textContent = `${progress}%`; // Update percentage text
+
+            // Stop the progress bar when it reaches 100%
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 60); // Adjust the speed of the progress bar (lower = faster)
 
         try {
             const response = await fetch('/generate-report', {
@@ -112,7 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.redirected) {
-                window.location.href = response.url; // Redirect to the report page
+                // Wait for the progress bar to complete before redirecting
+                setTimeout(() => {
+                    window.location.href = response.url; // Redirect to the report page
+                }, 1000); // Add a slight delay for a smooth transition
             } else {
                 throw new Error('Report generation failed');
             }
@@ -120,7 +142,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error:', error);
             window.location.href = '/error'; // Redirect to error page
         } finally {
-            fullScreenSpinner.style.display = 'none'; // Hide full-screen spinner
+            // Hide spinner and progress bar after completion
+            setTimeout(() => {
+                progressBarContainer.style.display = 'none';
+            }, 1000); // Add a slight delay for a smooth transition
         }
     });
 });

@@ -43,6 +43,18 @@
             <h2>Risk Levels</h2>
             <canvas id="riskLevelsChart"></canvas>
         </div>
+
+        <!-- Attack Types Radar Chart -->
+        <div class="chart-card">
+            <h2>Attack Types</h2>
+            <canvas id="attackTypesRadarChart"></canvas>
+        </div>
+
+        <!-- Security Events Polar Area Chart -->
+        <div class="chart-card">
+            <h2>Security Events</h2>
+            <canvas id="securityEventsPolarChart"></canvas>
+        </div>
     </div>
 
     <!-- Reports Section -->
@@ -120,17 +132,21 @@
                         },
                     });
     
-                    if (response.ok) {
-                        // Redirect to the dashboard to show the flash message
-                        window.location.href = "{{ url_for('dashboard') }}";
+                    if (response.redirected) {
+                        // If the response is a redirect, follow it
+                        window.location.href = response.url;
                     } else {
-                        // Redirect to the dashboard to show the flash message
-                        window.location.href = "{{ url_for('dashboard') }}";
+                        // Handle non-redirect responses (e.g., errors)
+                        const data = await response.json();
+                        console.error('Error:', data.message);
+                        alert('Failed to delete the report. Please try again.');
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    // Redirect to the dashboard to show the flash message
-                    window.location.href = "{{ url_for('dashboard') }}";
+                    alert('An error occurred. Please try again.');
+                } finally {
+                    // Hide the modal after the request is complete
+                    deleteModal.style.display = 'none';
                 }
             }
         });

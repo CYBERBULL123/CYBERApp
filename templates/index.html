@@ -2,7 +2,10 @@
 {% block content %}
 <div class="hero">
     <div class="hero-content">
-        <h1>Welcome to CyberSec AI</h1>
+        <h1>
+            <i class="fas fa-handshake feature-icon"></i>
+            Welcome !
+          </h1>
         <p>Generate professional cybersecurity reports with ease.</p>
         <form action="{{ url_for('index') }}" method="post" enctype="multipart/form-data" class="upload-form" id="uploadForm">
             <!-- Drag-and-Drop Area -->
@@ -28,6 +31,9 @@
                     <i class="fas fa-times"></i> Clear Files
                 </button>
             </div>
+            <p class="step-description">
+                Upload only cybersecurity findings or penetration testing reports.  Maximum file size: 20 MB. Avoid uploading sensitive or personal information 
+            </p>
         </form>
     </div>
 </div>
@@ -37,6 +43,16 @@
     <div class="spinner-content">
         <i class="fas fa-spinner fa-spin"></i>
         <p>Processing...</p>
+    </div>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress-bar-container" id="progressBarContainer">
+    <div class="progress-bar" id="progressBar"></div>
+    <span class="progress-text" id="progressText">0%</span>
+    <div class="spinner-content">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Generating...</p>
     </div>
 </div>
 
