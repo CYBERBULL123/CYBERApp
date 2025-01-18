@@ -9,6 +9,7 @@ instance/cybersecurity.db
 instance/
 list.py
 
+__pycache__
 
 # Ignore Python cache files
 __pycache__/
