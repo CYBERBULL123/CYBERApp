@@ -806,7 +806,7 @@ nav .hamburger .line {
 
 /* ==================== REPORT PAGE ==================== */
 .report-container {
-    max-width: 800px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: 20px;
     background-color: #1e1e2f; /* Dark background for the entire container */
