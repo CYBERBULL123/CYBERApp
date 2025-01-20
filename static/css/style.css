@@ -814,6 +814,15 @@ nav .hamburger .line {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stronger shadow for depth */
 }
 
+.user-notice {
+    background-color: #2a2a3f; /* Light yellow background */
+    border: 1px solid #2c2b2b; /* Border color */
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    color: #f54206; /* Dark yellow text */
+}
+
 .report-header {
     text-align: center;
     margin-bottom: 30px;
