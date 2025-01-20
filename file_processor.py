@@ -18,7 +18,7 @@ def extract_text_from_file(file):
         file: The file object to extract text from.
     
     Returns:
-        str: The extracted text, or None if extraction fails.
+        str: The extracted text, or an empty string if extraction fails.
     """
     filename = file.filename
     file_extension = filename.split('.')[-1].lower()
@@ -57,11 +57,11 @@ def extract_text_from_file(file):
 
         else:
             logger.error(f"Unsupported file type: {file_extension}")
-            return None
+            return ""  # Return an empty string for unsupported file types
 
     except Exception as e:
         logger.error(f"Error extracting text from {filename}: {e}")
-        return None
+        return ""  # Return an empty string if extraction fails
 
 def extract_keywords_and_numeric_values(text: str) -> Tuple[List[str], Dict[str, str]]:
     """
@@ -76,6 +76,11 @@ def extract_keywords_and_numeric_values(text: str) -> Tuple[List[str], Dict[str,
             - Dictionary of numeric values with their types (e.g., {"ip": "192.168.1.1"}).
     """
     try:
+        # Check if the input text is empty or None
+        if not text or not isinstance(text, str):
+            logger.warning("Input text is empty or invalid. Returning empty results.")
+            return [], {}
+
         # Convert text to lowercase
         text = text.lower()
         
@@ -111,4 +116,4 @@ def extract_keywords_and_numeric_values(text: str) -> Tuple[List[str], Dict[str,
         return keywords, numeric_values
     except Exception as e:
         logger.error(f"Failed to extract keywords and numeric values: {str(e)}")
-        raise
+        return [], {}  # Return empty results if extraction fails

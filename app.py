@@ -2,11 +2,9 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 import os
-from datetime import datetime
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
 import markdown
-from io import BytesIO
+from datetime import datetime
+from pdf_utils import generate_pdf
 from langchain_agent import generate_report
 from file_processor import extract_text_from_file
 from dotenv import load_dotenv
@@ -74,6 +72,99 @@ def home():
 def home_page():
     return render_template('home.html')
 
+@app.route('/ad_report', methods=['GET', 'POST'])
+@login_required
+def ad_report():
+    if request.method == 'POST':
+        # Extract common form data
+        report_type = request.form.get('reportType')
+        project_name = request.form.get('projectName')
+        client_name = request.form.get('clientName')
+        assessment_date = request.form.get('assessmentDate')
+        assessor_name = request.form.get('assessorName')
+
+        # Initialize findings, risk_analysis, and recommendations
+        findings = ""
+        risk_analysis = ""
+        recommendations = ""
+
+        # Extract additional fields based on report type
+        if report_type == "VAPT":
+            findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
+            risk_analysis = request.form.get('riskDescription', '') + "\n" + request.form.get('businessImpact', '')
+            recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
+        elif report_type == "Pentesting":
+            findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
+            risk_analysis = request.form.get('toolsUsed', '') + "\n" + request.form.get('stepsTaken', '')
+            recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
+        elif report_type == "Incident Response":
+            findings = request.form.get('incidentDescription', '')
+            risk_analysis = request.form.get('actionsTaken', '')
+            recommendations = request.form.get('futurePreventionStrategies', '') + "\n" + request.form.get('lessonsLearned', '')
+        elif report_type == "Compliance":
+            findings = request.form.get('complianceFindings', '')
+            recommendations = request.form.get('recommendations', '')
+        elif report_type == "Risk Assessment":
+            findings = request.form.get('risksIdentified', '') + "\n" + request.form.get('riskSeverity', '')
+            recommendations = request.form.get('riskMitigationPlan', '')
+
+        # Prepare data for the LangChain agent
+        form_data = {
+            "reportType": report_type,
+            "projectName": project_name,
+            "clientName": client_name,
+            "assessmentDate": assessment_date,
+            "assessorName": assessor_name,
+            "findings": findings,
+            "riskAnalysis": risk_analysis,
+            "recommendations": recommendations,
+        }
+
+        try:
+            # Generate report using the LangChain agent
+            report_content = generate_report(form_data)
+
+            # Save the report to the database
+            report_title = f"Advanced Report for {project_name}"
+            report = Report(title=report_title, content=report_content, user_id=current_user.id)
+            db.session.add(report)
+            db.session.commit()
+
+            flash('Advanced report generated successfully!', 'success')
+            return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+        except Exception as e:
+            flash(f'An error occurred: {str(e)}', 'error')
+            return redirect(url_for('ad_report'))
+
+    return render_template('ad_report.html')
+
+@app.route('/generate-report', methods=['POST'])
+@login_required
+def generate_report_route():
+    if 'extracted_text' not in request.form or 'fileName' not in request.form:
+        flash('No extracted text or file name found.', 'error')
+        return redirect(url_for('index'))
+
+    extracted_text = request.form['extracted_text']
+    file_name = request.form['fileName']
+
+    try:
+        # Step 3: Generate report using the extracted text
+        report_content = generate_report(extracted_text)
+
+        # Use the file name as the report title
+        report_title = f"Report for {file_name}"
+        report = Report(title=report_title, content=report_content, user_id=current_user.id)
+        db.session.add(report)
+        db.session.commit()
+
+        flash('Report generated successfully!', 'success')
+        return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
@@ -101,32 +192,6 @@ def index():
             return redirect(url_for('index'))
 
     return render_template('index.html')
-
-@app.route('/generate-report', methods=['POST'])
-@login_required
-def generate_report_route():
-    if 'extracted_text' not in request.form or 'fileName' not in request.form:
-        flash('No extracted text or file name found.', 'error')
-        return redirect(url_for('index'))
-
-    extracted_text = request.form['extracted_text']
-    file_name = request.form['fileName']
-
-    try:
-        # Step 3: Generate report using the extracted text
-        report_content = generate_report(extracted_text)
-
-        # Use the file name as the report title
-        report_title = f"Report for {file_name}"
-        report = Report(title=report_title, content=report_content, user_id=current_user.id)
-        db.session.add(report)
-        db.session.commit()
-
-        flash('Report generated successfully!', 'success')
-        return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
-    except Exception as e:
-        flash(f'An error occurred: {str(e)}', 'error')
-        return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -186,6 +251,10 @@ def dashboard():
     reports = Report.query.filter_by(user_id=current_user.id).all()
     return render_template('dashboard.html', reports=reports)
 
+@app.route('/error')
+def error():
+    return render_template('error.html')
+
 @app.route('/report/<int:report_id>')
 @login_required
 def report(report_id):
@@ -196,19 +265,23 @@ def report(report_id):
 @app.route('/download/<int:report_id>')
 @login_required
 def download(report_id):
+    # Fetch the report from the database
     report = Report.query.get_or_404(report_id)
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(100, 750, report.title)
-    p.setFont("Helvetica", 12)
-    text = p.beginText(100, 730)
-    text.textLines(report.content)
-    p.drawText(text)
-    p.showPage()
-    p.save()
-    buffer.seek(0)
-    return send_file(buffer, as_attachment=True, download_name=f"{report.title}.pdf", mimetype='application/pdf')
+
+    # Generate the PDF using the utility function
+    pdf_buffer = generate_pdf(
+        report_title=report.title,
+        report_content=report.content,
+        created_at=report.created_at.strftime('%Y-%m-%d %H:%M:%S')
+    )
+
+    # Prepare the buffer for download
+    return send_file(
+        pdf_buffer,
+        as_attachment=True,
+        download_name=f"{report.title}.pdf",
+        mimetype='application/pdf'
+    )
 
 @app.route('/delete-report/<int:report_id>', methods=['POST'])
 @login_required

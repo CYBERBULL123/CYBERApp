@@ -2,7 +2,7 @@ import os
 import logging
 import re
 import requests
-from typing import Dict, Any
+from typing import Dict, Any, List
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
@@ -92,24 +92,60 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
         prompt_template = PromptTemplate(
             input_variables=["data", "search_results", "keywords", "numeric_values"],
             template="""
-            You are a cybersecurity expert. Generate a professional and detailed cybersecurity report based on the following data:
-            {data}
+            **Role**: You are a senior cybersecurity analyst with expertise in vulnerability assessment, penetration testing, and incident response. Your task is to generate a comprehensive and professional cybersecurity report based on the provided data.
 
-            Additionally, use the following search results to enhance the report:
-            {search_results}
+            **Instructions**:
+            1. Use a **zero-shot learning approach** to analyze the data and generate insights without prior examples.
+            2. Apply **Chain-of-Thought (CoT)** and **Tree-of-Thought (ToT)** techniques to break down complex problems, explore multiple reasoning paths, and arrive at well-justified conclusions.
+            3. Structure the report in a professional format with clear sections and actionable recommendations.
+            4. Use technical terminology and provide in-depth analysis.
 
-            The following keywords were extracted from the data:
-            {keywords}
+            **Input Data**:
+            - Raw Data: {data}
+            - Search Results: {search_results}
+            - Extracted Keywords: {keywords}
+            - Extracted Numeric Values: {numeric_values}
 
-            The report should include:
-            1. Executive Summary
-            2. Detailed Analysis (including technical details like IPs, versions, etc.)
-            3. Key Findings
-            4. Recommendations (specific and actionable)
-            5. Conclusion
-            6. References (with their official links)
+            **Report Structure**:
+            1. **Executive Summary**:
+            - Provide a high-level overview of the findings, risks, and recommendations.
+            - Highlight the most critical issues and their potential impact on the organization.
 
-            Ensure the report is well-structured, concise, and actionable. Use technical terms and provide in-depth analysis.
+            2. **Detailed Analysis**:
+            - Analyze the data thoroughly, including technical details such as IP addresses, software versions, and configurations.
+            - Use CoT and ToT to explore multiple angles of the findings (e.g., root causes, attack vectors, potential exploits).
+            - Include tables, bullet points, or diagrams if necessary to present technical details clearly.
+
+            3. **Key Findings**:
+            - List and describe the key vulnerabilities, threats, and risks identified in the data.
+            - For each finding, provide:
+                - A detailed description of the issue.
+                - The potential impact on the organization.
+                - Evidence or reasoning supporting the finding (use CoT and ToT).
+
+            4. **Recommendations**:
+            - Provide specific, actionable, and prioritized recommendations to mitigate the identified risks.
+            - Include:
+                - Short-term fixes (e.g., patches, configuration changes).
+                - Long-term strategies (e.g., security policies, employee training).
+                - Tools or technologies that can help address the issues.
+
+            5. **Conclusion**:
+            - Summarize the overall security posture of the organization based on the findings.
+            - Highlight the importance of implementing the recommendations to prevent future incidents.
+
+            6. **References**:
+            - Include links to official documentation, tools, or resources mentioned in the report.
+            - Ensure all references are credible and relevant.
+
+            **Additional Guidelines**:
+            - Use a formal and professional tone.
+            - Avoid jargon unless it is clearly defined.
+            - Ensure the report is concise yet comprehensive.
+            - Proofread the report for grammar, spelling, and clarity.
+
+            **Output**:
+            Generate a well-structured, detailed, and actionable cybersecurity report based on the above instructions.
             """
         )
         report_chain = LLMChain(llm=llm, prompt=prompt_template)
@@ -119,21 +155,21 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
         logger.error(f"Failed to create report chain: {str(e)}")
         raise
 
-def validate_data(data: str) -> bool:
+def validate_data(data: Any) -> bool:
     """
     Validate the input data for report generation.
     """
-    if not data or not isinstance(data, str):
-        logger.error("Invalid data: Data must be a non-empty string.")
+    if not data or (isinstance(data, str) and not data.strip()):
+        logger.error("Invalid data: Data must be a non-empty string or dictionary.")
         return False
     return True
 
-def generate_report(data: str) -> str:
+def generate_report(data: Any) -> str:
     """
     Generate a cybersecurity report using Gemini LLM and LangChain.
     
     Args:
-        data (str): The raw file content to generate the report from.
+        data (Any): The raw file content or form data to generate the report from.
     
     Returns:
         str: The generated report.
@@ -149,7 +185,15 @@ def generate_report(data: str) -> str:
         report_chain = create_report_chain(llm)
         
         # Extract keywords and numeric values from the input data
-        keywords, numeric_values = extract_keywords_and_numeric_values(data)
+        if isinstance(data, str):
+            keywords, numeric_values = extract_keywords_and_numeric_values(data)
+        elif isinstance(data, dict):
+            # For advanced form inputs, extract keywords and numeric values from the findings
+            findings = data.get("findings", "")
+            keywords, numeric_values = extract_keywords_and_numeric_values(findings)
+        else:
+            raise ValueError("Unsupported data type. Expected str or dict.")
+        
         logger.info(f"Extracted keywords: {keywords}")
         logger.info(f"Extracted numeric values: {numeric_values}")
         
@@ -159,10 +203,10 @@ def generate_report(data: str) -> str:
         
         # Wrap the data, search results, keywords, and numeric values in a dictionary
         input_data = {
-            "data": data,
+            "data": data if isinstance(data, str) else str(data),  # Convert dict to string if necessary
             "search_results": search_results,
             "keywords": keywords,
-            # "numeric_values": numeric_values,
+            "numeric_values": numeric_values,
         }
         
         # Generate the report using the LangChain

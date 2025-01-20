@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Report Generation Section -->
+<div class="report-generation-section">
+    <h1><i class="fas fa-file-alt"></i> Advanced Report Generation</h1>
+    <div class="report-tabs">
+        <button class="tab-button active" data-tab="vapt">
+            <i class="fas fa-shield-alt"></i> VAPT
+        </button>
+        <button class="tab-button" data-tab="pentest">
+            <i class="fas fa-bug"></i> Pentesting
+        </button>
+        <button class="tab-button" data-tab="incident-response">
+            <i class="fas fa-exclamation-triangle"></i> Incident Response
+        </button>
+        <button class="tab-button" data-tab="compliance">
+            <i class="fas fa-check-circle"></i> Compliance
+        </button>
+        <button class="tab-button" data-tab="risk-assessment">
+            <i class="fas fa-chart-line"></i> Risk Assessment
+        </button>
+    </div>
+
+    <!-- VAPT Form -->
+    <div id="vapt" class="tab-content active">
+        <form class="report-form" method="POST" action="{{ url_for('ad_report') }}">
+            <input type="hidden" name="reportType" value="VAPT">
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> General Information</h3>
+                <input type="text" name="projectName" placeholder="Project Name" value="Project Alpha" required>
+                <input type="text" name="clientName" placeholder="Client Name" value="Client XYZ" required>
+                <input type="date" name="assessmentDate" placeholder="Assessment Date" value="2023-10-15" required>
+                <input type="text" name="assessorName" placeholder="Assessor Name" value="John Doe" required>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-search"></i> Findings</h3>
+                <textarea name="highLevelFindings" placeholder="High-Level Findings" required>Critical vulnerabilities found in the web application.</textarea>
+                <textarea name="detailedFindings" placeholder="Detailed Findings" required>SQL Injection, Cross-Site Scripting (XSS), and insecure authentication mechanisms were identified.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-exclamation-circle"></i> Risk Analysis</h3>
+                <textarea name="riskDescription" placeholder="Risk Description" required>High risk of data breaches due to SQL Injection vulnerabilities.</textarea>
+                <textarea name="businessImpact" placeholder="Business Impact" required>Potential loss of sensitive customer data and reputational damage.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                <textarea name="mitigationStrategies" placeholder="Mitigation Strategies" required>Implement input validation, use prepared statements, and enforce strong authentication.</textarea>
+                <textarea name="additionalNotes" placeholder="Additional Notes">Ensure regular security audits and penetration testing.</textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-magic"></i> Generate VAPT Report
+            </button>
+        </form>
+    </div>
+
+    <!-- Pentesting Form -->
+    <div id="pentest" class="tab-content">
+        <form class="report-form" method="POST" action="{{ url_for('ad_report') }}">
+            <input type="hidden" name="reportType" value="Pentesting">
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> General Information</h3>
+                <input type="text" name="projectName" placeholder="Project Name" value="Project Beta" required>
+                <input type="text" name="clientName" placeholder="Client Name" value="Client ABC" required>
+                <input type="date" name="assessmentDate" placeholder="Assessment Date" value="2023-10-20" required>
+                <input type="text" name="assessorName" placeholder="Assessor Name" value="Jane Smith" required>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-search"></i> Findings</h3>
+                <textarea name="highLevelFindings" placeholder="High-Level Findings" required>Multiple vulnerabilities identified in the network infrastructure.</textarea>
+                <textarea name="detailedFindings" placeholder="Detailed Findings" required>Open ports, weak encryption, and misconfigured firewalls were discovered.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-tools"></i> Exploitation Details</h3>
+                <textarea name="toolsUsed" placeholder="Tools Used" required>Nmap, Metasploit, Wireshark</textarea>
+                <textarea name="stepsTaken" placeholder="Steps Taken" required>Port scanning, vulnerability exploitation, and traffic analysis were performed.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                <textarea name="mitigationStrategies" placeholder="Mitigation Strategies" required>Close unnecessary ports, update encryption protocols, and reconfigure firewalls.</textarea>
+                <textarea name="additionalNotes" placeholder="Additional Notes">Conduct regular network security assessments.</textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-magic"></i> Generate Pentest Report
+            </button>
+        </form>
+    </div>
+
+    <!-- Incident Response Form -->
+    <div id="incident-response" class="tab-content">
+        <form class="report-form" method="POST" action="{{ url_for('ad_report') }}">
+            <input type="hidden" name="reportType" value="Incident Response">
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> Incident Details</h3>
+                <input type="text" name="incidentName" placeholder="Incident Name" value="Data Breach Incident" required>
+                <input type="date" name="incidentDate" placeholder="Incident Date" value="2023-10-10" required>
+                <textarea name="incidentDescription" placeholder="Incident Description" required>Unauthorized access to customer data was detected.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-tasks"></i> Actions Taken</h3>
+                <textarea name="actionsTaken" placeholder="Actions Taken" required>Isolated affected systems, notified stakeholders, and initiated forensic analysis.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-graduation-cap"></i> Lessons Learned</h3>
+                <textarea name="lessonsLearned" placeholder="Lessons Learned" required>Need for stronger access controls and regular security training.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                <textarea name="futurePreventionStrategies" placeholder="Future Prevention Strategies" required>Implement multi-factor authentication and conduct regular security audits.</textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-magic"></i> Generate Incident Response Plan
+            </button>
+        </form>
+    </div>
+
+    <!-- Compliance Form -->
+    <div id="compliance" class="tab-content">
+        <form class="report-form" method="POST" action="{{ url_for('ad_report') }}">
+            <input type="hidden" name="reportType" value="Compliance">
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> General Information</h3>
+                <input type="text" name="projectName" placeholder="Project Name" value="Project Gamma" required>
+                <input type="text" name="clientName" placeholder="Client Name" value="Client DEF" required>
+                <input type="date" name="assessmentDate" placeholder="Assessment Date" value="2023-10-25" required>
+                <input type="text" name="complianceType" placeholder="Compliance Type" value="GDPR" required>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-search"></i> Compliance Findings</h3>
+                <textarea name="complianceFindings" placeholder="Compliance Findings" required>Non-compliance with GDPR data protection requirements.</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-lightbulb"></i> Recommendations</h3>
+                <textarea name="recommendations" placeholder="Recommendations" required>Update privacy policies, implement data encryption, and conduct staff training.</textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-magic"></i> Generate Compliance Report
+            </button>
+        </form>
+    </div>
+
+    <!-- Risk Assessment Form -->
+    <div id="risk-assessment" class="tab-content">
+        <form class="report-form" method="POST" action="{{ url_for('ad_report') }}">
+            <input type="hidden" name="reportType" value="Risk Assessment">
+            <div class="form-section">
+                <h3><i class="fas fa-info-circle"></i> General Information</h3>
+                <input type="text" name="projectName" placeholder="Project Name" value="Project Delta" required>
+                <input type="text" name="clientName" placeholder="Client Name" value="Client GHI" required>
+                <input type="date" name="assessmentDate" placeholder="Assessment Date" value="2023-10-30" required>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-exclamation-circle"></i> Risk Details</h3>
+                <textarea name="risksIdentified" placeholder="Risks Identified" required>High risk of phishing attacks and malware infections.</textarea>
+                <textarea name="riskSeverity" placeholder="Risk Severity" required>Critical</textarea>
+            </div>
+            <div class="form-section">
+                <h3><i class="fas fa-lightbulb"></i> Mitigation Plan</h3>
+                <textarea name="riskMitigationPlan" placeholder="Risk Mitigation Plan" required>Implement email filtering, conduct employee training, and deploy endpoint protection.</textarea>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-magic"></i> Generate Risk Assessment Report
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Full-Screen Loading Spinner -->
+<div id="fullScreenSpinner" class="full-screen-spinner">
+    <div class="spinner-content">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Processing...</p>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+
+{% endblock %}

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             message.style.opacity = '0';
             message.style.transform = 'translateX(100%)';
             setTimeout(() => message.remove(), 500); // Remove after slide-out
-        }, 5000); // 5 seconds delay
+        }, 3000); // 3 seconds delay
 
         // Close button functionality
         const closeButton = message.querySelector('.close-btn');
@@ -52,5 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
             alert.style.opacity = '0';
             setTimeout(() => alert.remove(), 500); // Remove after fade-out
         }, 3000); // 3 seconds delay
+    });
+});
+
+// Handle tab switching
+document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to the clicked tab and corresponding content
+            tab.classList.add('active');
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
     });
 });
