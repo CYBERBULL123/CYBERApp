@@ -129,7 +129,32 @@
                 <input type="text" name="projectName" placeholder="Project Name" value="Project Gamma" required>
                 <input type="text" name="clientName" placeholder="Client Name" value="Client DEF" required>
                 <input type="date" name="assessmentDate" placeholder="Assessment Date" value="2023-10-25" required>
-                <input type="text" name="complianceType" placeholder="Compliance Type" value="GDPR" required>
+                
+                <!-- Dropdown for Compliance Types -->
+                <label for="complianceType">Compliance Type:</label>
+                <select name="complianceType" id="complianceType" required>
+                    <option value="GDPR">General Data Protection Regulation (GDPR)</option>
+                    <option value="HIPAA">Health Insurance Portability and Accountability Act (HIPAA)</option>
+                    <option value="PCI-DSS">Payment Card Industry Data Security Standard (PCI-DSS)</option>
+                    <option value="ISO-27001">ISO/IEC 27001 (Information Security Management)</option>
+                    <option value="SOC-2">Service Organization Control 2 (SOC 2)</option>
+                    <option value="NIST">NIST Cybersecurity Framework</option>
+                    <option value="CCPA">California Consumer Privacy Act (CCPA)</option>
+                    <option value="SOX">Sarbanes-Oxley Act (SOX)</option>
+                    <option value="FISMA">Federal Information Security Management Act (FISMA)</option>
+                    <option value="COBIT">Control Objectives for Information and Related Technologies (COBIT)</option>
+                    <option value="ITIL">Information Technology Infrastructure Library (ITIL)</option>
+                    <option value="CIS">Center for Internet Security (CIS) Controls</option>
+                    <option value="FERPA">Family Educational Rights and Privacy Act (FERPA)</option>
+                    <option value="GLBA">Gramm-Leach-Bliley Act (GLBA)</option>
+                    <option value="PIPEDA">Personal Information Protection and Electronic Documents Act (PIPEDA)</option>
+                    <option value="CSA-STAR">Cloud Security Alliance Security, Trust, Assurance, and Risk (CSA STAR)</option>
+                    <option value="HITRUST">Health Information Trust Alliance (HITRUST)</option>
+                    <option value="CMMC">Cybersecurity Maturity Model Certification (CMMC)</option>
+                    <option value="FedRAMP">Federal Risk and Authorization Management Program (FedRAMP)</option>
+                    <option value="COPPA">Children's Online Privacy Protection Act (COPPA)</option>
+                    <option value="Other">Other (Specify in Recommendations)</option>
+                </select>
             </div>
             <div class="form-section">
                 <h3><i class="fas fa-search"></i> Compliance Findings</h3>
@@ -179,6 +204,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/reports.js') }}"></script>
+<script src="{{ url_for('static', filename='js/report.js') }}"></script>
 
 {% endblock %}

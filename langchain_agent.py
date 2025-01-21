@@ -90,63 +90,58 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
     """
     try:
         prompt_template = PromptTemplate(
-            input_variables=["data", "search_results", "keywords", "numeric_values"],
-            template="""
-            **Role**: You are a senior cybersecurity analyst with expertise in vulnerability assessment, penetration testing, and incident response. Your task is to generate a comprehensive and professional cybersecurity report based on the provided data.
+        input_variables=["data", "search_results", "keywords", "numeric_values"],
+        template="""
+        **Role**: You are an advanced cybersecurity AI agent with expertise in vulnerability assessment, penetration testing, and incident response. Your task is to analyze the input data, apply reasoning, and generate a highly detailed and actionable security report.
 
-            **Instructions**:
-            1. Use a **zero-shot learning approach** to analyze the data and generate insights without prior examples.
-            2. Apply **Chain-of-Thought (CoT)** and **Tree-of-Thought (ToT)** techniques to break down complex problems, explore multiple reasoning paths, and arrive at well-justified conclusions.
-            3. Structure the report in a professional format with clear sections and actionable recommendations.
-            4. Use technical terminology and provide in-depth analysis.
+        **Capabilities**:
+        - Perform **multi-modal reasoning** using Chain-of-Thought (CoT), Tree-of-Thought (ToT), and RPA (Robust Problem Analysis) techniques to solve complex challenges.
+        - Evaluate the context critically and explore various hypotheses to derive insightful conclusions.
+        - Synthesize data from multiple sources, correlate findings, and provide accurate and justified security recommendations.
 
-            **Input Data**:
-            - Raw Data: {data}
-            - Search Results: {search_results}
-            - Extracted Keywords: {keywords}
-            - Extracted Numeric Values: {numeric_values}
+        **Input Data**:
+        - Raw Data: {data}
+        - Search Results: {search_results}
+        - Extracted Keywords: {keywords}
+        - Extracted Numeric Values: {numeric_values}
 
-            **Report Structure**:
-            1. **Executive Summary**:
-            - Provide a high-level overview of the findings, risks, and recommendations.
-            - Highlight the most critical issues and their potential impact on the organization.
+        **Report Structure**:
+        1. **Strategic Overview**:
+            - Contextualize the findings in the organization's cybersecurity landscape.
+            - Identify high-level risks and potential attack vectors based on the provided data.
 
-            2. **Detailed Analysis**:
-            - Analyze the data thoroughly, including technical details such as IP addresses, software versions, and configurations.
-            - Use CoT and ToT to explore multiple angles of the findings (e.g., root causes, attack vectors, potential exploits).
-            - Include tables, bullet points, or diagrams if necessary to present technical details clearly.
+        2. **Multi-Layered Analysis**:
+            - **Layer 1 (CoT)**: Sequentially analyze each vulnerability or risk to identify root causes and potential impacts.
+            - **Layer 2 (ToT)**: Explore alternative scenarios or threat vectors that could exploit the vulnerabilities.
+            - **Layer 3 (RPA)**: Combine reasoning approaches to identify overlooked risks or mitigation strategies.
 
-            3. **Key Findings**:
-            - List and describe the key vulnerabilities, threats, and risks identified in the data.
-            - For each finding, provide:
-                - A detailed description of the issue.
-                - The potential impact on the organization.
-                - Evidence or reasoning supporting the finding (use CoT and ToT).
+        3. **Detailed Key Findings**:
+            - Present detailed descriptions of identified vulnerabilities, their severity, and their impact.
+            - Provide correlation with relevant data (e.g., IP addresses, logs, system configurations).
+            - Include tables or visualizations for clarity.
 
-            4. **Recommendations**:
-            - Provide specific, actionable, and prioritized recommendations to mitigate the identified risks.
-            - Include:
-                - Short-term fixes (e.g., patches, configuration changes).
-                - Long-term strategies (e.g., security policies, employee training).
-                - Tools or technologies that can help address the issues.
+        4. **Actionable Recommendations**:
+            - Short-term measures: Patches, configuration adjustments, immediate containment strategies.
+            - Long-term measures: Policy changes, incident response improvements, and advanced monitoring solutions.
+            - Prioritize recommendations based on risk levels and potential impact.
 
-            5. **Conclusion**:
-            - Summarize the overall security posture of the organization based on the findings.
-            - Highlight the importance of implementing the recommendations to prevent future incidents.
+        5. **Advanced Insights**:
+            - Highlight emerging threats and trends derived from search results and external knowledge.
+            - Correlate findings with industry benchmarks or standards like NIST, ISO 27001, or OWASP.
 
-            6. **References**:
-            - Include links to official documentation, tools, or resources mentioned in the report.
-            - Ensure all references are credible and relevant.
+        6. **Summary and Roadmap**:
+            - Summarize the organization’s current security posture.
+            - Provide a roadmap for implementing recommendations and achieving a robust security framework.
 
-            **Additional Guidelines**:
-            - Use a formal and professional tone.
-            - Avoid jargon unless it is clearly defined.
-            - Ensure the report is concise yet comprehensive.
-            - Proofread the report for grammar, spelling, and clarity.
+        **Guidelines**:
+        - Use precise, technical language and maintain professionalism.
+        - Justify all findings with reasoning and evidence.
+        - Ensure the report is concise but comprehensive, with no redundant information.
+        - Include hyperlinks to tools, standards, and additional resources.
 
-            **Output**:
-            Generate a well-structured, detailed, and actionable cybersecurity report based on the above instructions.
-            """
+        **Objective**:
+        Generate a detailed and actionable report that helps organizations improve their security posture, mitigate risks, and enhance resilience against cyber threats.
+        """
         )
         report_chain = LLMChain(llm=llm, prompt=prompt_template)
         logger.info("Report generation chain created successfully.")

@@ -22,49 +22,87 @@ document.addEventListener('DOMContentLoaded', function () {
     const fullScreenSpinner = document.getElementById('fullScreenSpinner');
 
     forms.forEach(form => {
-        form.addEventListener('submit', function (e) {
+        form.addEventListener('submit', async function (e) {
             e.preventDefault();
 
             // Show the full-screen spinner
             fullScreenSpinner.style.display = 'flex';
 
+            try {
+                // Create FormData object from the form
+                const formData = new FormData(this);
 
-            // Create FormData object from the form
-            const formData = new FormData(this);
+                // Send form data directly to the backend
+                const response = await fetch('/generate-report', {
+                    method: 'POST',
+                    body: formData, // Send FormData directly
+                });
 
-            // Send form data directly to the backend
-            fetch('/generate-report', {
-                method: 'POST',
-                body: formData, // Send FormData directly
-            })
-            .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    flash('Report generated successfully!');
-                    // Wait for the progress bar to complete before redirecting
-                    setTimeout(() => {
-                        window.location.href = `/report/${data.report_id}`; // Redirect to the report page
-                    }, 1000); // Add a slight delay for a smooth transition
+
+                // Check if the response is a redirect
+                if (response.redirected) {
+                    // Redirect to the URL provided by Flask
+                    window.location.href = response.url;
                 } else {
-                    throw new Error(data.message || 'Failed to generate report');
+                    // Handle JSON response (if any)
+                    const data = await response.json();
+                    if (data.success) {
+                        // Flash success message (assuming you have a flash function)
+                        flash('Report generated successfully!', 'success');
+                        // Redirect to the report page after a slight delay
+                        setTimeout(() => {
+                            window.location.href = `/report/${data.report_id}`;
+                        }, 1000); // Add a slight delay for a smooth transition
+                    } else {
+                        throw new Error(data.message || 'Failed to generate report');
+                    }
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
-                flash('An error occurred while generating the report. Please check the console for details.');
-            })
-            .finally(() => {
-                // Hide the full-screen spinner and progress bar after completion
+                // Flash error message (assuming you have a flash function)
+                flash('An error occurred while generating the report. Please check the console for details.', 'error');
+            } finally {
+                // Hide the full-screen spinner after completion
                 setTimeout(() => {
                     fullScreenSpinner.style.display = 'none';
-                    }, 
-                );
-            });
+                }, 1000); // Add a slight delay for a smooth transition
+            }
         });
     });
+
+    // Prevent form submission on Enter key press
+    forms.forEach(form => {
+        form.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent form submission
+                saveFormData(form); // Save form data
+            }
+        });
+    });
+
+    // Function to save form data
+    function saveFormData(form) {
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        console.log('Form Data Saved:', data);
+    }
+
+    // Flash message function (if not already defined)
+    function flash(message, type) {
+        const flashContainer = document.createElement('div');
+        flashContainer.className = `flash-message ${type}`;
+        flashContainer.textContent = message;
+        document.body.appendChild(flashContainer);
+
+        // Remove the flash message after 3 seconds
+        setTimeout(() => {
+            flashContainer.remove();
+        }, 3000);
+    }
 });

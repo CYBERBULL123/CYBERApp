@@ -72,55 +72,81 @@ def home():
 def home_page():
     return render_template('home.html')
 
-@app.route('/ad_report', methods=['GET', 'POST'])
+@app.route('/ad_report', methods=['GET'])
 @login_required
 def ad_report():
-    if request.method == 'POST':
-        # Extract common form data
-        report_type = request.form.get('reportType')
-        project_name = request.form.get('projectName')
-        client_name = request.form.get('clientName')
-        assessment_date = request.form.get('assessmentDate')
-        assessor_name = request.form.get('assessorName')
+    # Render the form page
+    return render_template('ad_report.html')
 
-        # Initialize findings, risk_analysis, and recommendations
-        findings = ""
-        risk_analysis = ""
-        recommendations = ""
+@app.route('/generate-report', methods=['POST'])
+@login_required
+def generate_report_route():
+    try:
+        # Check if the request contains extracted text (from uploaded file)
+        if 'extracted_text' in request.form and 'fileName' in request.form:
+            extracted_text = request.form['extracted_text']
+            file_name = request.form['fileName']
 
-        # Extract additional fields based on report type
-        if report_type == "VAPT":
-            findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
-            risk_analysis = request.form.get('riskDescription', '') + "\n" + request.form.get('businessImpact', '')
-            recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
-        elif report_type == "Pentesting":
-            findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
-            risk_analysis = request.form.get('toolsUsed', '') + "\n" + request.form.get('stepsTaken', '')
-            recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
-        elif report_type == "Incident Response":
-            findings = request.form.get('incidentDescription', '')
-            risk_analysis = request.form.get('actionsTaken', '')
-            recommendations = request.form.get('futurePreventionStrategies', '') + "\n" + request.form.get('lessonsLearned', '')
-        elif report_type == "Compliance":
-            findings = request.form.get('complianceFindings', '')
-            recommendations = request.form.get('recommendations', '')
-        elif report_type == "Risk Assessment":
-            findings = request.form.get('risksIdentified', '') + "\n" + request.form.get('riskSeverity', '')
-            recommendations = request.form.get('riskMitigationPlan', '')
+            # Generate report using the extracted text
+            report_content = generate_report(extracted_text)
 
-        # Prepare data for the LangChain agent
-        form_data = {
-            "reportType": report_type,
-            "projectName": project_name,
-            "clientName": client_name,
-            "assessmentDate": assessment_date,
-            "assessorName": assessor_name,
-            "findings": findings,
-            "riskAnalysis": risk_analysis,
-            "recommendations": recommendations,
-        }
+            # Use the file name as the report title
+            report_title = f"Report for {file_name}"
+            report = Report(title=report_title, content=report_content, user_id=current_user.id)
+            db.session.add(report)
+            db.session.commit()
 
-        try:
+            flash('Report generated successfully!', 'success')
+            return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
+
+        # Check if the request contains form data (from ad_html)
+        elif 'reportType' in request.form and 'projectName' in request.form:
+            # Extract common form data
+            report_type = request.form.get('reportType')
+            project_name = request.form.get('projectName')
+            client_name = request.form.get('clientName')
+            assessment_date = request.form.get('assessmentDate')
+            assessor_name = request.form.get('assessorName')
+            compilance_name = request.form.get('complianceType')
+
+            # Initialize findings, risk_analysis, and recommendations
+            findings = ""
+            risk_analysis = ""
+            recommendations = ""
+
+            # Extract additional fields based on report type
+            if report_type == "VAPT":
+                findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
+                risk_analysis = request.form.get('riskDescription', '') + "\n" + request.form.get('businessImpact', '')
+                recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
+            elif report_type == "Pentesting":
+                findings = request.form.get('highLevelFindings', '') + "\n" + request.form.get('detailedFindings', '')
+                risk_analysis = request.form.get('toolsUsed', '') + "\n" + request.form.get('stepsTaken', '')
+                recommendations = request.form.get('mitigationStrategies', '') + "\n" + request.form.get('additionalNotes', '')
+            elif report_type == "Incident Response":
+                findings = request.form.get('incidentDescription', '')
+                risk_analysis = request.form.get('actionsTaken', '')
+                recommendations = request.form.get('futurePreventionStrategies', '') + "\n" + request.form.get('lessonsLearned', '')
+            elif report_type == "Compliance":
+                findings = request.form.get('complianceFindings', '')
+                recommendations = request.form.get('recommendations', '')
+            elif report_type == "Risk Assessment":
+                findings = request.form.get('risksIdentified', '') + "\n" + request.form.get('riskSeverity', '')
+                recommendations = request.form.get('riskMitigationPlan', '')
+
+            # Prepare data for the LangChain agent
+            form_data = {
+                "reportType": report_type,
+                "projectName": project_name,
+                "clientName": client_name,
+                "assessmentDate": assessment_date,
+                "assessorName": assessor_name,
+                "findings": findings,
+                "riskAnalysis": risk_analysis,
+                "recommendations": recommendations,
+                "complianceType":compilance_name
+            }
+
             # Generate report using the LangChain agent
             report_content = generate_report(form_data)
 
@@ -132,37 +158,14 @@ def ad_report():
 
             flash('Advanced report generated successfully!', 'success')
             return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
-        except Exception as e:
-            flash(f'An error occurred: {str(e)}', 'error')
-            return redirect(url_for('ad_report'))
 
-    return render_template('ad_report.html')
+        else:
+            flash('Invalid request data. Please try again.', 'error')
+            return redirect(url_for('index'))
 
-@app.route('/generate-report', methods=['POST'])
-@login_required
-def generate_report_route():
-    if 'extracted_text' not in request.form or 'fileName' not in request.form:
-        flash('No extracted text or file name found.', 'error')
-        return redirect(url_for('index'))
-
-    extracted_text = request.form['extracted_text']
-    file_name = request.form['fileName']
-
-    try:
-        # Step 3: Generate report using the extracted text
-        report_content = generate_report(extracted_text)
-
-        # Use the file name as the report title
-        report_title = f"Report for {file_name}"
-        report = Report(title=report_title, content=report_content, user_id=current_user.id)
-        db.session.add(report)
-        db.session.commit()
-
-        flash('Report generated successfully!', 'success')
-        return redirect(url_for('report', report_id=report.id))  # Redirect to the report page
     except Exception as e:
         flash(f'An error occurred: {str(e)}', 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('error'))
 
 
 @app.route('/index', methods=['GET', 'POST'])
