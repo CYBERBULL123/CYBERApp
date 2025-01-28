@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 import os
 import markdown
 from datetime import datetime
-from pdf_utils import generate_pdf
+from pdf_utils import CyberSecurityReport
 from langchain_agent import generate_report
 from file_processor import extract_text_from_file
 from dotenv import load_dotenv
@@ -262,7 +262,7 @@ def error():
 @login_required
 def report(report_id):
     report = Report.query.get_or_404(report_id)
-    report_html = markdown.markdown(report.content)
+    report_html = markdown.markdown(report.content , extensions=['tables'])
     return render_template('report.html', report=report, report_html=report_html)
 
 @app.route('/download/<int:report_id>')
@@ -272,9 +272,9 @@ def download(report_id):
     report = Report.query.get_or_404(report_id)
 
     # Generate the PDF using the utility function
-    pdf_buffer = generate_pdf(
-        report_title=report.title,
-        report_content=report.content,
+    pdf_buffer = CyberSecurityReport().generate(
+        title=report.title,
+        content=report.content,
         created_at=report.created_at.strftime('%Y-%m-%d %H:%M:%S')
     )
 

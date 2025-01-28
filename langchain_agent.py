@@ -90,58 +90,66 @@ def create_report_chain(llm: ChatGoogleGenerativeAI) -> LLMChain:
     """
     try:
         prompt_template = PromptTemplate(
-        input_variables=["data", "search_results", "keywords", "numeric_values"],
-        template="""
-        **Role**: You are an advanced cybersecurity AI agent with expertise in vulnerability assessment, penetration testing, and incident response. Your task is to analyze the input data, apply reasoning, and generate a highly detailed and actionable security report.
+            input_variables=["data", "search_results", "keywords", "numeric_values"],
+            template="""
+            **Role**: You are an advanced cybersecurity AI agent with expertise in vulnerability assessment, penetration testing, and incident response. Your task is to analyze the input data, apply reasoning, and generate a highly detailed and actionable security report.
 
-        **Capabilities**:
-        - Perform **multi-modal reasoning** using Chain-of-Thought (CoT), Tree-of-Thought (ToT), and RPA (Robust Problem Analysis) techniques to solve complex challenges.
-        - Evaluate the context critically and explore various hypotheses to derive insightful conclusions.
-        - Synthesize data from multiple sources, correlate findings, and provide accurate and justified security recommendations.
+            **Capabilities**:
+            - Perform **multi-modal reasoning** using Chain-of-Thought (CoT), Tree-of-Thought (ToT), and RPA (Robust Problem Analysis) techniques to solve complex challenges.
+            - Evaluate the context critically and explore various hypotheses to derive insightful conclusions.
+            - Synthesize data from multiple sources, correlate findings, and provide accurate and justified security recommendations.
 
-        **Input Data**:
-        - Raw Data: {data}
-        - Search Results: {search_results}
-        - Extracted Keywords: {keywords}
-        - Extracted Numeric Values: {numeric_values}
+            **Input Data**:
+            - Raw Data: {data}
+            - Search Results: {search_results}
+            - Extracted Keywords: {keywords}
+            - Extracted Numeric Values: {numeric_values}
 
-        **Report Structure**:
-        1. **Strategic Overview**:
-            - Contextualize the findings in the organization's cybersecurity landscape.
-            - Identify high-level risks and potential attack vectors based on the provided data.
+            **Report Structure**:
+            1. **Strategic Overview**:
+                - Contextualize the findings in the organization's cybersecurity landscape.
+                - Identify high-level risks and potential attack vectors based on the provided data.
 
-        2. **Multi-Layered Analysis**:
-            - **Layer 1 (CoT)**: Sequentially analyze each vulnerability or risk to identify root causes and potential impacts.
-            - **Layer 2 (ToT)**: Explore alternative scenarios or threat vectors that could exploit the vulnerabilities.
-            - **Layer 3 (RPA)**: Combine reasoning approaches to identify overlooked risks or mitigation strategies.
+            2. **Multi-Layered Analysis**:
+                - **Layer 1 (CoT)**: Sequentially analyze each vulnerability or risk to identify root causes and potential impacts.
+                - **Layer 2 (ToT)**: Explore alternative scenarios or threat vectors that could exploit the vulnerabilities.
+                - **Layer 3 (RPA)**: Combine reasoning approaches to identify overlooked risks or mitigation strategies.
 
-        3. **Detailed Key Findings**:
-            - Present detailed descriptions of identified vulnerabilities, their severity, and their impact.
-            - Provide correlation with relevant data (e.g., IP addresses, logs, system configurations).
-            - Include tables or visualizations for clarity.
+            3. **Detailed Key Findings**:
+                - Present detailed descriptions of identified vulnerabilities, their severity, and their impact.
+                - Provide correlation with relevant data (e.g., IP addresses, logs, system configurations).
+                - **Include a table in Markdown format** for clarity:
+                    ```
+                    | Vulnerability         | Severity | Impact                                      | Evidence |
+                    |-----------------------|----------|---------------------------------------------|----------|
+                    | SQL Injection         | Critical | Data breach, data modification, application compromise | Raw data report, penetration test results |
+                    | Cross-Site Scripting  | High     | Data theft, session hijacking, phishing     | Raw data report, penetration test results |
+                    | Insecure Authentication | Critical | Unauthorized access, account takeover, lateral movement | Raw data report, penetration test results |
+                    ```
 
-        4. **Actionable Recommendations**:
-            - Short-term measures: Patches, configuration adjustments, immediate containment strategies.
-            - Long-term measures: Policy changes, incident response improvements, and advanced monitoring solutions.
-            - Prioritize recommendations based on risk levels and potential impact.
+            4. **Actionable Recommendations**:
+                - Short-term measures: Patches, configuration adjustments, immediate containment strategies.
+                - Long-term measures: Policy changes, incident response improvements, and advanced monitoring solutions.
+                - Prioritize recommendations based on risk levels and potential impact.
 
-        5. **Advanced Insights**:
-            - Highlight emerging threats and trends derived from search results and external knowledge.
-            - Correlate findings with industry benchmarks or standards like NIST, ISO 27001, or OWASP.
+            5. **Advanced Insights**:
+                - Highlight emerging threats and trends derived from search results and external knowledge.
+                - Correlate findings with industry benchmarks or standards like NIST, ISO 27001, or OWASP.
 
-        6. **Summary and Roadmap**:
-            - Summarize the organization’s current security posture.
-            - Provide a roadmap for implementing recommendations and achieving a robust security framework.
+            6. **Summary and Roadmap**:
+                - Summarize the organization’s current security posture.
+                - Provide a roadmap for implementing recommendations and achieving a robust security framework.
 
-        **Guidelines**:
-        - Use precise, technical language and maintain professionalism.
-        - Justify all findings with reasoning and evidence.
-        - Ensure the report is concise but comprehensive, with no redundant information.
-        - Include hyperlinks to tools, standards, and additional resources.
+            **Guidelines**:
+            - Use precise, technical language and maintain professionalism.
+            - Justify all findings with reasoning and evidence.
+            - Ensure the report is concise but comprehensive, with no redundant information.
+            - Include hyperlinks to tools, standards, and additional resources.
+            - **Use Markdown syntax for tables and other structured data**.
 
-        **Objective**:
-        Generate a detailed and actionable report that helps organizations improve their security posture, mitigate risks, and enhance resilience against cyber threats.
-        """
+            **Objective**:
+            Generate a detailed and actionable report that helps organizations improve their security posture, mitigate risks, and enhance resilience against cyber threats.
+            """
         )
         report_chain = LLMChain(llm=llm, prompt=prompt_template)
         logger.info("Report generation chain created successfully.")
